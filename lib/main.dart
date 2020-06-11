@@ -23,9 +23,12 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  
+  bool advancedSettings = false; 
   String advice = "";
   var adviceid;
   var timeInterval = 1;
+
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
   AndroidInitializationSettings androidInitializationSettings;
@@ -105,12 +108,21 @@ class _HomeState extends State<Home> {
   //     }
 
   void showNote() {
-    Timer.periodic(new Duration(seconds: timeInterval), (call) {
-      print("hi");
-      notification();
-      fetchApi();
-    });
+    if(advancedSettings){
+        Timer.periodic(new Duration(seconds: timeInterval), (call) {
+        print("hi");
+        notification();
+        fetchApi();
+      });
+    }
+    else{
+
+      setState(() {
+        timeInterval = 0;
+      });
+    }
   }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -118,7 +130,10 @@ class _HomeState extends State<Home> {
       backgroundColor: Colors.blueGrey[900],
       appBar: AppBar(
         title: Text("Daily Advice"),
-        centerTitle: true,
+        centerTitle: false,
+        actions: <Widget>[
+          Icon(Icons.info)
+        ],
         backgroundColor: Colors.black26,
       ),
       body: SingleChildScrollView(
@@ -198,14 +213,25 @@ class _HomeState extends State<Home> {
                   ToggleSwitch(
                       minWidth: 60.0,
                       cornerRadius: 20,
-                      activeBgColor: Colors.green,
+                      activeBgColor: Colors.red.withOpacity(.7),
                       activeTextColor: Colors.white,
                       inactiveBgColor: Colors.grey,
                       inactiveTextColor: Colors.white,
-                      activeColors: [Colors.green, Colors.red.withOpacity(.7)],
-                      labels: ['On', 'Off'],
+                      activeColors: [Colors.red.withOpacity(.7),Colors.green],
+                      labels: ['Off','On'],
                       onToggle: (index) {
-                        print('switched to: $index');
+                        if(index == 0){
+                          setState(() {
+                            advancedSettings = false;
+                            print(advancedSettings);
+                          });
+                        }
+                        else{
+                          setState(() {
+                            advancedSettings = true;
+                            print(advancedSettings);
+                          });
+                        }
                       }),
                 ],
               ),
@@ -237,7 +263,7 @@ class _HomeState extends State<Home> {
                     });
                   },
                 ),
-                Text(timeInterval.toString(), style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w500),),
+                Text(timeInterval.toString()+" hours", style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w500),),
                 RaisedButton(
                   child: Icon(Icons.add),
                   shape: RoundedRectangleBorder(
@@ -275,3 +301,4 @@ class _HomeState extends State<Home> {
     );
   }
 }
+
